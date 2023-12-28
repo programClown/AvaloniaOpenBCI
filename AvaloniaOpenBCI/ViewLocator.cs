@@ -2,15 +2,18 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using AvaloniaOpenBCI.ViewModels;
+using FluentAvalonia.UI.Controls;
 
 namespace AvaloniaOpenBCI;
 
-public class ViewLocator : IDataTemplate
+public class ViewLocator : IDataTemplate, INavigationPageFactory
 {
     public Control? Build(object? data)
     {
         if (data is null)
+        {
             return null;
+        }
 
         var name = data.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
         var type = Type.GetType(name);
@@ -28,5 +31,15 @@ public class ViewLocator : IDataTemplate
     public bool Match(object? data)
     {
         return data is ViewModelBase;
+    }
+
+    public Control GetPage(Type srcType)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Control GetPageFromObject(object target)
+    {
+        throw new NotImplementedException();
     }
 }
