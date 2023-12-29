@@ -1,4 +1,6 @@
-﻿namespace AvaloniaOpenBCI.ViewModels;
+﻿using AvaloniaOpenBCI.ViewModels.Base;
+
+namespace AvaloniaOpenBCI.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {

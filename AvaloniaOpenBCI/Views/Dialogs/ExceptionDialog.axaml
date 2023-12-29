@@ -1,11 +1,16 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:dialogs="clr-namespace:AvaloniaOpenBCI.ViewModels.Dialogs"
-             x:DataType="dialogs:ExceptionViewModel"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="AvaloniaOpenBCI.Views.Dialogs.ExceptionDialog">
+﻿<controls:AppWindowBase xmlns="https://github.com/avaloniaui"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                        xmlns:dialogs="clr-namespace:AvaloniaOpenBCI.ViewModels.Dialogs"
+                        xmlns:controls="clr-namespace:AvaloniaOpenBCI.Controls"
+                        x:DataType="dialogs:ExceptionViewModel"
+                        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                        Icon="/Assets/app-icon.ico"
+                        Width="800"
+                        Height="550"
+                        Title="AvaloniaOpenBCI - 异常"
+                        x:Class="AvaloniaOpenBCI.Views.Dialogs.ExceptionDialog">
     <Grid RowDefinitions="Auto,*,Auto,*">
         <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto">
             <!--  Info  -->
@@ -13,7 +18,7 @@
                 Grid.Row="0"
                 Theme="{DynamicResource SubtitleTextBlockStyle}"
                 Margin="16"
-                Text="发生了异常"
+                Text="发生意外错误"
                 TextWrapping="Wrap"
                 VerticalAlignment="Top" />
 
@@ -24,9 +29,57 @@
                     Header="{Binding ExceptionType, Mode=OneWay,TargetNullValue=-, FallbackValue=Unknown Exception}"
                     IsExpanded="True"
                     Padding="12,12,12,12"
-                    Margin="16,0,16,0" />
+                    Margin="16,0,16,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel DataContext="{Binding Exception}" Spacing="4">
+                            <!--  Exception Message  -->
+                            <TextBlock Theme="{DynamicResource BodyStrongTextBlockStyle}" Text="详细信息" />
+                            <SelectableTextBlock Text="{Binding Message}"
+                                                 TextWrapping="WrapWithOverflow"
+                                                 Margin="0,0,0,8"
+                                                 SelectionBrush="DodgerBlue" />
+                            <!--  Callstack  -->
+                            <TextBlock Theme="{DynamicResource BodyStrongTextBlockStyle}" Text="调用栈" />
+                            <controls:Card
+                                Margin="0,0,0,8"
+                                Background="{DynamicResource ComboBoxDropDownBackground}">
+                                <SelectableTextBlock
+                                    FontSize="13"
+                                    SelectionBrush="DodgerBlue"
+                                    FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                    TextWrapping="Wrap"
+                                    Text="{Binding StackTrace}" />
+                            </controls:Card>
+                            <!--  Inner exception  -->
+                            <TextBlock
+                                Theme="{DynamicResource BodyStrongTextBlockStyle}"
+                                IsVisible="{Binding InnerException, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Text="内部异常" />
+                            <controls:Card
+                                IsVisible="{Binding InnerException, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Background="{DynamicResource ComboBoxDropDownBackground}">
+                                <SelectableTextBlock
+                                    FontSize="13"
+                                    SelectionBrush="DodgerBlue"
+                                    FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                    TextWrapping="Wrap"
+                                    Text="{Binding InnerException}" />
+                            </controls:Card>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Expander>
             </DockPanel>
+            <!--  Close Button  -->
+            <Button
+                Name="ExitButton"
+                IsDefault="True"
+                Content="退出程序"
+                Click="ExitButton_OnClick"
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                Margin="16"
+                Padding="8" />
         </Grid>
     </Grid>
 
-</UserControl>
+</controls:AppWindowBase>

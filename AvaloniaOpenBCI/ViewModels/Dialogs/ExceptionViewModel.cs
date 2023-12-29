@@ -1,4 +1,5 @@
 ﻿using System;
+using AvaloniaOpenBCI.ViewModels.Base;
 
 namespace AvaloniaOpenBCI.ViewModels.Dialogs;
 

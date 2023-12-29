@@ -2,14 +2,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AvaloniaOpenBCI.App"
              xmlns:local="using:AvaloniaOpenBCI"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             xmlns:idcr="using:Dock.Avalonia.Controls.Recycling"
+             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             RequestedThemeVariant="Dark">
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
-  
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="Styles/ThemeColors.axaml" />
+                <ResourceInclude Source="Styles/ThemeMaterials.axaml" />
+                <ResourceInclude Source="Styles/Card.axaml" />
+                <ResourceInclude Source="Styles/ContextMenuStyles.axaml" />
+                <ResourceInclude Source="Styles/ControlThemes/HyperlinkIconButtonStyles.axaml" />
+                <ResourceInclude Source="Styles/ControlThemes/ListBoxStyles.axaml" />
+                <ResourceInclude Source="Styles/ListBoxStyles.axaml" />
+                <ResourceInclude Source="Styles/FAComboBoxStyles.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <idcr:ControlRecycling x:Key="ControlRecycling" />
+            <x:Double x:Key="ContentDialogMaxWidth">700</x:Double>
+
+            <SolidColorBrush x:Key="ToolTipBackground" Color="#1E1F22" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="#9FBDC3" />
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
-        <FluentTheme />
+        <styling:FluentAvaloniaTheme PreferUserAccentColor="True" UseSystemFontOnWindows="True"
+                                     TextVerticalAlignmentOverrideBehavior="Disabled" />
+        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml" />
+        <StyleInclude Source="avares://AsyncImageLoader.Avalonia/AdvancedImage.axaml" />
+        <StyleInclude Source="avares://Avalonia.Xaml.Interactions.Draggable/Styles.axaml" />
     </Application.Styles>
+
 </Application>

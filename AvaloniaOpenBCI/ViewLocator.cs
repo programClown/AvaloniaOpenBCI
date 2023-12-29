@@ -1,7 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using AvaloniaOpenBCI.ViewModels;
+using AvaloniaOpenBCI.ViewModels.Base;
 using FluentAvalonia.UI.Controls;
 
 namespace AvaloniaOpenBCI;
@@ -28,18 +28,9 @@ public class ViewLocator : IDataTemplate, INavigationPageFactory
         return new TextBlock { Text = "Not Found: " + name };
     }
 
-    public bool Match(object? data)
-    {
-        return data is ViewModelBase;
-    }
+    public bool Match(object? data) => data is ViewModelBase;
 
-    public Control GetPage(Type srcType)
-    {
-        throw new NotImplementedException();
-    }
+    public Control GetPage(Type srcType) => throw new NotImplementedException();
 
-    public Control GetPageFromObject(object target)
-    {
-        throw new NotImplementedException();
-    }
+    public Control GetPageFromObject(object target) => throw new NotImplementedException();
 }
