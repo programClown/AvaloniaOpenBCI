@@ -1,11 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using AsyncImageLoader;
+﻿using AsyncImageLoader;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -20,14 +13,21 @@ using Projektanker.Icons.Avalonia.FontAwesome;
 using Semver;
 using Serilog;
 using SkiaSharp;
+using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AvaloniaOpenBCI;
 
 internal sealed class Program
 {
-    readonly private static bool _isDebugExceptionDialog = false;
+    private static readonly bool IsDebugExceptionDialog = false;
     public static bool IsDebugBuild { get; private set; }
-    public static Stopwatch StartupTimer { get; } = new();
+    public static Stopwatch StartupTimer { get; } = new Stopwatch();
 
     public static bool UseOpenGlRendering { get; } = false;
 
@@ -48,9 +48,9 @@ internal sealed class Program
             .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
             .CreateLogger();
 
-        LiveCharts.Configure(config => // mark
+        LiveCharts.Configure(config =>                                                // mark
                 config.HasGlobalSKTypeface(SKFontManager.Default.MatchCharacter('汉')) // <- Chinese // mark
-        ); // mark
+        );                                                                            // mark
 
         string? infoVersion = Assembly
             .GetExecutingAssembly()
@@ -60,7 +60,7 @@ internal sealed class Program
         Compat.AppVersion = SemVersion.Parse(infoVersion ?? "0.0.0", SemVersionStyles.Strict);
 
         // Configure exception dialog for unhandled exceptions
-        if (!Debugger.IsAttached || _isDebugExceptionDialog)
+        if (!Debugger.IsAttached || IsDebugExceptionDialog)
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }

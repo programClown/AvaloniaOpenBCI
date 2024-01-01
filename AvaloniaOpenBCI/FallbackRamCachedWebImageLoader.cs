@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Threading.Tasks;
-using AsyncAwaitBestPractices;
+﻿using AsyncAwaitBestPractices;
 using AsyncImageLoader.Loaders;
 using Avalonia.Media.Imaging;
 using AvaloniaOpenBCI.Extensions;
 using AvaloniaOpenBCI.Helper;
+using System;
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace AvaloniaOpenBCI;
 
@@ -16,7 +16,7 @@ public readonly record struct ImageLoadFailedEventArgs(string Url, Exception Exc
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class FallbackRamCachedWebImageLoader : RamCachedWebImageLoader
 {
-    readonly private WeakEventManager<ImageLoadFailedEventArgs> _loadFailEventHandler = new();
+    private readonly WeakEventManager<ImageLoadFailedEventArgs> _loadFailEventHandler = new();
 
     public event EventHandler<ImageLoadFailedEventArgs> LoadFailed
     {
@@ -24,12 +24,14 @@ public class FallbackRamCachedWebImageLoader : RamCachedWebImageLoader
         remove => _loadFailEventHandler.RemoveEventHandler(value);
     }
 
-    protected void OnLoadFailed(string url, Exception exception) =>
+    protected void OnLoadFailed(string url, Exception exception)
+    {
         _loadFailEventHandler.RaiseEvent(
             this,
             new ImageLoadFailedEventArgs(url, exception),
             nameof(LoadFailed)
         );
+    }
 
     /// <summary>
     ///     Attempts to load bitmap
@@ -59,8 +61,8 @@ public class FallbackRamCachedWebImageLoader : RamCachedWebImageLoader
         }
 
         Bitmap? internalOrCachedBitmap =
-            await LoadFromInternalAsync(url).ConfigureAwait(false)
-            ?? await LoadFromGlobalCache(url).ConfigureAwait(false);
+            await LoadFromInternalAsync(url).ConfigureAwait(false) ??
+            await LoadFromGlobalCache(url).ConfigureAwait(false);
 
         if (internalOrCachedBitmap != null)
         {
@@ -80,7 +82,7 @@ public class FallbackRamCachedWebImageLoader : RamCachedWebImageLoader
             await SaveToGlobalCache(url, externalBytes).ConfigureAwait(false);
             return bitmap;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return null;
         }
@@ -89,15 +91,15 @@ public class FallbackRamCachedWebImageLoader : RamCachedWebImageLoader
     public void RemovePathFromCache(string filePath)
     {
         var cache =
-            this.GetPrivateField<ConcurrentDictionary<string, Task<Bitmap?>>>("_memoryCache")
-            ?? throw new NullReferenceException("Memory cache not found");
+            this.GetPrivateField<ConcurrentDictionary<string, Task<Bitmap?>>>("_memoryCache") ??
+            throw new NullReferenceException("Memory cache not found");
     }
 
     public void RemoveAllNamesFromCache(string fileName)
     {
         var cache =
-            this.GetPrivateField<ConcurrentDictionary<string, Task<Bitmap?>>>("_memoryCache")
-            ?? throw new NullReferenceException("Memory cache not found");
+            this.GetPrivateField<ConcurrentDictionary<string, Task<Bitmap?>>>("_memoryCache") ??
+            throw new NullReferenceException("Memory cache not found");
 
         foreach ((string key, var _) in cache)
         {
