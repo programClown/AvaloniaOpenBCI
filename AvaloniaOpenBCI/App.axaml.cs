@@ -1,3 +1,7 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -6,16 +10,13 @@ using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
-using AvaloniaOpenBCI.Attributes;
 using AvaloniaOpenBCI.Helper;
+using AvaloniaOpenBCI.Models.Configs;
 using AvaloniaOpenBCI.ViewModels;
 using AvaloniaOpenBCI.Views;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace AvaloniaOpenBCI;
 
@@ -29,10 +30,7 @@ public class App : Application
     [NotNull]
     public static Visual? VisualRoot { get; internal set; }
 
-    public static TopLevel TopLevel
-    {
-        get => TopLevel.GetTopLevel(VisualRoot)!;
-    }
+    public static TopLevel TopLevel => TopLevel.GetTopLevel(VisualRoot)!;
 
     [NotNull]
     public static IStorageProvider? StorageProvider { get; internal set; }
@@ -45,10 +43,8 @@ public class App : Application
     public static IConfiguration? Config { get; internal set; }
 
     // ReSharper disable once MemberCanBePrivate.Global
-    public IClassicDesktopStyleApplicationLifetime? DesktopLifetime
-    {
-        get => ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
-    }
+    public IClassicDesktopStyleApplicationLifetime? DesktopLifetime =>
+        ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
 
     /// <summary>
     ///     Called before <see cref="Services" /> is built.
@@ -95,6 +91,10 @@ public class App : Application
     private static void ConfigureServiceProvider()
     {
         IServiceCollection services = ConfigureServices();
+
+        BeforeBuildServiceProvider?.Invoke(null, services);
+
+        Services = services.BuildServiceProvider();
     }
 
     internal static IServiceCollection ConfigureServices()
@@ -106,20 +106,29 @@ public class App : Application
         services.AddMessagePipe();
         services.AddMessagePipeNamedPipeInterprocess("AvaloniaOpenBCI");
 
-        var exportedTypes = AppDomain
-            .CurrentDomain
-            .GetAssemblies()
-            .Where(a => a.FullName?.StartsWith("AvaloniaOpenBCI") == true)
-            .SelectMany(a => a.GetExportedTypes())
-            .ToArray();
+        services.AddSingleton<MainWindow>(_ => new MainWindow
+            {
+                DataContext = new MainWindowViewModel()
+            }
+        );
 
-        var transientTypes = exportedTypes
-            .Select(t => new { t, attributes = t.GetCustomAttributes(typeof(TransientAttribute), false) })
-            .Where(
-                t1 => t1.attributes is { Length: > 0 } &&
-                      !t1.t.Name.Contains("Mock", StringComparison.OrdinalIgnoreCase))
-            .Select(t1 => new { Type = t1.t, Attribute = (TransientAttribute)t1.attributes[0] });
-        
+
+        Config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", true, true)
+            .Build();
+
+        services.Configure<DebugOptions>(Config.GetSection(nameof(DebugOptions)));
+
+        if (Compat.IsWindows)
+        {
+            services.AddSingleton<IPrerequisiteHelper, WindowsPrerequisiteHelper>();
+        }
+        else if (Compat.IsLinux || Compat.IsMacOS)
+        {
+            services.AddSingleton<IPrerequisiteHelper, UnixPrerequisiteHelper>();
+        }
+
         return services;
     }
 
