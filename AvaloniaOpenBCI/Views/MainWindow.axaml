@@ -1,21 +1,107 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:AvaloniaOpenBCI.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="AvaloniaOpenBCI.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        WindowStartupLocation="CenterScreen"
-        Title="AvaloniaOpenBCI">
+<controls:AppWindowBase
+    x:Class="AvaloniaOpenBCI.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:base="using:AvaloniaOpenBCI.ViewModels.Base"
+    xmlns:controls="clr-namespace:AvaloniaOpenBCI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AvaloniaOpenBCI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:AvaloniaOpenBCI.ViewModels"
+    Title="AvaloniaOpenBCI"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:MainWindowViewModel"
+    Icon="/Assets/avalonia-logo.ico"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <controls:AppWindowBase.Resources>
+        <SolidColorBrush x:Key="BrushB0" Color="#FFFFFFFF" />
+        <DrawingImage x:Key="BrandsPatreonSymbolWhite">
+            <DrawingGroup>
+                <GeometryDrawing Brush="{DynamicResource BrushB0}" Geometry="F1 M1033.05 324.45C1032.86 186.55 925.46 73.53 799.45 32.75C642.97 -17.89 436.59 -10.55 287.17 59.95C106.07 145.41 49.18 332.61 47.06 519.31C45.32 672.81 60.64 1077.1 288.68 1079.98C458.12 1082.13 483.35 863.8 561.75 758.65C617.53 683.84 689.35 662.71 777.76 640.83C929.71 603.22 1033.27 483.3 1033.05 324.45Z" />
+            </DrawingGroup>
+        </DrawingImage>
+    </controls:AppWindowBase.Resources>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-</Window>
+    <Grid RowDefinitions="Auto, Auto,*">
+        <Grid
+            Name="TitleBatHost"
+            Height="32"
+            Background="Transparent"
+            ColumnDefinitions="Auto,Auto,*,Auto">
+            <Image
+                Name="WindowIcon"
+                Width="18"
+                Height="18"
+                Margin="12,4"
+                DockPanel.Dock="Left"
+                IsHitTestVisible="False"
+                RenderOptions.BitmapInterpolationMode="HighQuality"
+                Source="/Assets/app-icon.ico">
+                <Image.IsVisible>
+                    <OnPlatform Default="False">
+                        <On Content="True" Options="Windows" />
+                    </OnPlatform>
+                </Image.IsVisible>
+            </Image>
+
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                FontSize="12"
+                IsHitTestVisible="False"
+                Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                <TextBlock.IsVisible>
+                    <OnPlatform Default="False">
+                        <On Content="True" Options="Windows" />
+                    </OnPlatform>
+                </TextBlock.IsVisible>
+            </TextBlock>
+
+            <Border Grid.Column="2" Padding="6" />
+        </Grid>
+        <ui:NavigationView
+            Name="NavigationView"
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            FooterMenuItemsSource="{Binding FooterPages, Mode=OneWay}"
+            IsPaneOpen="False"
+            IsSettingsVisible="False"
+            ItemInvoked="NavigationView_OnItemInvoked"
+            MenuItemsSource="{Binding Pages, Mode=OneWay}"
+            OpenPaneLength="200"
+            PaneDisplayMode="Left"
+            SelectedItem="{Binding SelectedCategory}">
+            <ui:NavigationView.MenuItemTemplate>
+                <DataTemplate DataType="{x:Type base:PageViewModelBase}">
+                    <ui:NavigationViewItem
+                        Margin="0"
+                        Content="{Binding Title}"
+                        IconSource="{Binding IconSource}"
+                        Tag="{Binding}" />
+                </DataTemplate>
+            </ui:NavigationView.MenuItemTemplate>
+
+            <ui:NavigationView.PaneFooter>
+                <StackPanel>
+                    <ui:NavigationViewItem Name="JoinUs" Content="加入我们">
+                        <ui:NavigationViewItem.IconSource>
+                            <ui:ImageIconSource Source="{StaticResource BrandsPatreonSymbolWhite}" />
+                        </ui:NavigationViewItem.IconSource>
+                    </ui:NavigationViewItem>
+                </StackPanel>
+            </ui:NavigationView.PaneFooter>
+
+            <ui:Frame Name="FrameView">
+                <ui:Frame.NavigationPageFactory>
+                    <local:ViewLocator />
+                </ui:Frame.NavigationPageFactory>
+            </ui:Frame>
+        </ui:NavigationView>
+    </Grid>
+
+</controls:AppWindowBase>

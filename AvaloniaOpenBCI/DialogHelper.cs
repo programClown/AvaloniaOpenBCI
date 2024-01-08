@@ -1,4 +1,11 @@
-﻿using Avalonia;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input.Platform;
@@ -18,13 +25,6 @@ using Markdown.Avalonia;
 using Refit;
 using Serilog;
 using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
 using TextMateSharp.Grammars;
 
 namespace AvaloniaOpenBCI;
@@ -39,13 +39,10 @@ public static class DialogHelper
     public static BetterContentDialog CreateTextEntryDialog(
         string title,
         string description,
-        IReadOnlyList<TextBoxField> textFields)
+        IReadOnlyList<TextBoxField> textFields
+    )
     {
-        return CreateTextEntryDialog(
-            title,
-            new MarkdownScrollViewer
-                { Markdown = description },
-            textFields);
+        return CreateTextEntryDialog(title, new MarkdownScrollViewer { Markdown = description }, textFields);
     }
 
     /// <summary>
@@ -55,7 +52,8 @@ public static class DialogHelper
         string title,
         string description,
         string imageSource,
-        IReadOnlyList<TextBoxField> textFields)
+        IReadOnlyList<TextBoxField> textFields
+    )
     {
         var markdown = new MarkdownScrollViewer { Markdown = description };
         var image = new BetterAdvancedImage((Uri?)null)
@@ -72,11 +70,7 @@ public static class DialogHelper
 
         var grid = new Grid
         {
-            RowDefinitions =
-            {
-                new RowDefinition(GridLength.Star),
-                new RowDefinition(GridLength.Auto)
-            },
+            RowDefinitions = { new RowDefinition(GridLength.Star), new RowDefinition(GridLength.Auto) },
             Children = { markdown, image }
         };
 
@@ -86,7 +80,8 @@ public static class DialogHelper
     public static BetterContentDialog CreateTextEntryDialog(
         string title,
         Control content,
-        IReadOnlyList<TextBoxField> textFields)
+        IReadOnlyList<TextBoxField> textFields
+    )
     {
         Dispatcher.UIThread.VerifyAccess();
 
@@ -97,19 +92,15 @@ public static class DialogHelper
 
         var grid = new Grid
         {
-            RowDefinitions =
-            {
-                new RowDefinition(GridLength.Auto),
-                new RowDefinition(GridLength.Star)
-            },
+            RowDefinitions = { new RowDefinition(GridLength.Auto), new RowDefinition(GridLength.Star) },
             Children = { content, stackPanel }
         };
 
         grid.Loaded += (_, _) =>
         {
             // Focus first TextBox
-            var firstTextBox = stackPanel.Children
-                .OfType<StackPanel>()
+            var firstTextBox = stackPanel
+                .Children.OfType<StackPanel>()
                 .FirstOrDefault()
                 .FindDescendantOfType<TextBox>();
 
@@ -119,24 +110,19 @@ public static class DialogHelper
 
         // Disable primary button if any textboxes are invalid
         var primaryCommand = new RelayCommand(
-            delegate
-            {
-            },
+            delegate { },
             () =>
             {
                 int invalidCount = textFields.Count(field => !field.IsValid);
                 Logger.Debug($"Checking can execute: {invalidCount} invalid fields");
                 return invalidCount == 0;
-            });
+            }
+        );
 
         // Create textboxes
         foreach (TextBoxField field in textFields)
         {
-            var label = new TextBlock
-            {
-                Text = field.Label,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
+            var label = new TextBlock { Text = field.Label, Margin = new Thickness(0, 0, 0, 4) };
 
             var textBox = new TextBox
             {
@@ -156,8 +142,7 @@ public static class DialogHelper
                 };
             }
 
-            stackPanel.Children.Add(new StackPanel
-                { Spacing = 4, Children = { label, textBox } });
+            stackPanel.Children.Add(new StackPanel { Spacing = 4, Children = { label, textBox } });
 
             // When IsValid property changes, update invalid count and primary button
             field.PropertyChanged += (_, args) =>
@@ -200,12 +185,12 @@ public static class DialogHelper
     public static BetterContentDialog CreateMarkdownDialog(
         string markdown,
         string? title = null,
-        TextEditorPreset editorPreset = default)
+        TextEditorPreset editorPreset = default
+    )
     {
         Dispatcher.UIThread.VerifyAccess();
 
-        var viewer = new MarkdownScrollViewer
-            { Markdown = markdown };
+        var viewer = new MarkdownScrollViewer { Markdown = markdown };
 
         // Apply syntax highlighting to code blocks if preset is provided
         if (editorPreset != default)
@@ -214,8 +199,7 @@ public static class DialogHelper
 
             int appliedCount = 0;
 
-            if (
-                viewer.GetLogicalDescendants().FirstOrDefault()?.GetLogicalDescendants() is { } stackDescendants)
+            if (viewer.GetLogicalDescendants().FirstOrDefault()?.GetLogicalDescendants() is { } stackDescendants)
             {
                 foreach (TextEditor editor in stackDescendants.OfType<TextEditor>())
                 {
@@ -238,7 +222,8 @@ public static class DialogHelper
 
             Logger.Write(
                 appliedCount > 0 ? LogEventLevel.Debug : LogEventLevel.Warning,
-                $"Applied syntax highlighting to {appliedCount} code blocks");
+                $"Applied syntax highlighting to {appliedCount} code blocks"
+            );
         }
 
         return new BetterContentDialog
@@ -253,9 +238,7 @@ public static class DialogHelper
     /// <summary>
     ///     Create a dialog fot displaying an ApiException
     /// </summary>
-    public static BetterContentDialog CreateApiExceptionDialog(
-        ApiException exception,
-        string? title = null)
+    public static BetterContentDialog CreateApiExceptionDialog(ApiException exception, string? title = null)
     {
         Dispatcher.UIThread.VerifyAccess();
 
@@ -310,8 +293,8 @@ public static class DialogHelper
                 );
                 string formatted = JsonSerializer.Serialize(
                     jsonElement,
-                    new JsonSerializerOptions
-                        { WriteIndented = true });
+                    new JsonSerializerOptions { WriteIndented = true }
+                );
 
                 textEditor.Document.Text = formatted;
             }
@@ -328,10 +311,7 @@ public static class DialogHelper
     /// <summary>
     ///     Create a dialog for displaying json
     /// </summary>
-    public static BetterContentDialog CreateJsonDialog(
-        string json,
-        string? title = null,
-        string? subTitle = null)
+    public static BetterContentDialog CreateJsonDialog(string json, string? title = null, string? subTitle = null)
     {
         Dispatcher.UIThread.VerifyAccess();
 
@@ -343,9 +323,7 @@ public static class DialogHelper
             Options = { ShowColumnRulers = false, AllowScrollBelowDocument = false }
         };
         var registryOptions = new RegistryOptions(ThemeName.DarkPlus);
-        textEditor
-            .InstallTextMate(registryOptions)
-            .SetGrammar(registryOptions.GetScopeByLanguageId("json"));
+        textEditor.InstallTextMate(registryOptions).SetGrammar(registryOptions.GetScopeByLanguageId("json"));
 
         var mainGrid = new StackPanel
         {
@@ -364,7 +342,8 @@ public static class DialogHelper
                     FontSize = 18,
                     FontWeight = FontWeight.Medium,
                     Margin = new Thickness(0, 8)
-                });
+                }
+            );
         }
 
         var dialog = new BetterContentDialog
@@ -382,11 +361,7 @@ public static class DialogHelper
             // Deserialize to json element then re-serialize to ensure indentation
             var jsonElement = JsonSerializer.Deserialize<JsonElement>(
                 json,
-                new JsonSerializerOptions
-                {
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                }
+                new JsonSerializerOptions { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip }
             );
             string formatted = JsonSerializer.Serialize(
                 jsonElement,
@@ -427,8 +402,7 @@ public static class DialogHelper
                     Text = title,
                     TextWrapping = TextWrapping.WrapWithOverflow
                 },
-                new TextBlock
-                    { Text = description, TextWrapping = TextWrapping.WrapWithOverflow }
+                new TextBlock { Text = description, TextWrapping = TextWrapping.WrapWithOverflow }
             }
         };
 

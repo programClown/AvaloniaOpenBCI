@@ -8,6 +8,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using AvaloniaOpenBCI.Helper;
@@ -23,6 +24,8 @@ namespace AvaloniaOpenBCI;
 public class App : Application
 {
     private static bool _isAsyncDisposeComplete;
+
+    public App() { }
 
     [NotNull]
     public static IServiceProvider? Services { get; internal set; }
@@ -67,8 +70,7 @@ public class App : Application
     {
         // Remove DataAnnotations validation plugin since we're using INotifyDataErrorInfo from MvvmToolKit
         var dataValidationPluginsToRemove = BindingPlugins
-            .DataValidators
-            .OfType<DataAnnotationsValidationPlugin>()
+            .DataValidators.OfType<DataAnnotationsValidationPlugin>()
             .ToArray();
 
         foreach (DataAnnotationsValidationPlugin plugin in dataValidationPluginsToRemove)
@@ -78,15 +80,41 @@ public class App : Application
 
         base.OnFrameworkInitializationCompleted();
 
+        ConfigureServiceProvider();
 
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        // if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        // {
+        //     desktop.MainWindow = new MainWindow { DataContext = new MainWindowViewModel() };
+        // }
+
+        if (DesktopLifetime is not null)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel()
-            };
+            ShowMainWindow();
         }
     }
+
+    private void ShowMainWindow()
+    {
+        if (DesktopLifetime is null)
+            return;
+
+        var mainViewModel = Services.GetRequiredService<MainWindowViewModel>();
+
+        var mainWindow = Services.GetRequiredService<MainWindow>();
+        mainWindow.DataContext = mainViewModel;
+
+        mainWindow.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
+        mainWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+        VisualRoot = mainWindow;
+        StorageProvider = mainWindow.StorageProvider;
+        Clipboard = mainWindow.Clipboard ?? throw new NullReferenceException("Clipboard is null");
+
+        DesktopLifetime.MainWindow = mainWindow;
+        DesktopLifetime.Exit += OnExit;
+    }
+
+    private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e) { }
 
     private static void ConfigureServiceProvider()
     {
@@ -106,12 +134,9 @@ public class App : Application
         services.AddMessagePipe();
         services.AddMessagePipeNamedPipeInterprocess("AvaloniaOpenBCI");
 
-        services.AddSingleton<MainWindow>(_ => new MainWindow
-            {
-                DataContext = new MainWindowViewModel()
-            }
-        );
+        services.AddSingleton<MainWindow>();
 
+        services.AddSingleton<MainWindowViewModel>();
 
         Config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
