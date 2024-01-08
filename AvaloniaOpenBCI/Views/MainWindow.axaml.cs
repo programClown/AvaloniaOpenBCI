@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using AsyncImageLoader;
@@ -33,8 +35,22 @@ public partial class MainWindow : AppWindowBase
 
     private FlyoutBase? _progressFlyout;
 
+    [DesignOnly(true)]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public MainWindow()
     {
+        _notificationService = null;
+        _navigationService = null;
+    }
+
+    public MainWindow(
+        INotificationService notificationService,
+        INavigationService<MainWindowViewModel> navigationService
+    )
+    {
+        _notificationService = notificationService;
+        _navigationService = navigationService;
+
         InitializeComponent();
 
         TitleBar.ExtendsContentIntoTitleBar = true;

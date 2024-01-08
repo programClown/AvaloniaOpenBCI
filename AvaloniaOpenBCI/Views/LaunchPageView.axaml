@@ -1,0 +1,223 @@
+﻿<controls:UserControlBase
+    x:Class="AvaloniaOpenBCI.Views.LaunchPageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonia="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+    xmlns:controls="using:AvaloniaOpenBCI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:AvaloniaOpenBCI.ViewModels"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:LaunchPageViewModel"
+    mc:Ignorable="d">
+
+    <controls:UserControlBase.Resources>
+        <system:Boolean x:Key="True">True</system:Boolean>
+        <system:Boolean x:Key="False">False</system:Boolean>
+    </controls:UserControlBase.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Grid Margin="0,8,0,8" ColumnDefinitions="Auto,*,Auto,Auto">
+            <Grid Margin="16,8,0,0" ColumnDefinitions="0.8*,0.2*">
+                <!--  Use split if extra commands, otherwise normal launch button  -->
+                <Grid
+                    x:Name="LaunchButtonGrid"
+                    Grid.Row="0"
+                    Grid.Column="0">
+                    <Button
+                        Width="95"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Stretch"
+                        Classes="success"
+                        Content="启动"
+                        IsVisible="True" />
+                    <SplitButton
+                        Width="104"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Stretch"
+                        Classes="success"
+                        Content="启动"
+                        IsVisible="True">
+                        <SplitButton.Flyout>
+                            <ui:FAMenuFlyout ItemsSource="{Binding SelectedPackageExtraCommands}" Placement="Bottom">
+                                <ui:FAMenuFlyout.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type system:String}">
+                                        <!--  ReSharper disable Xaml.PossibleNullReferenceException  -->
+                                        <!--  ReSharper disable Xaml.BindingWithContextNotResolved  -->
+                                        <ui:MenuFlyoutItem
+                                            Command="{ReflectionBinding #LaunchButtonGrid.DataContext.LaunchCommand}"
+                                            CommandParameter="{Binding}"
+                                            Text="{Binding}" />
+                                        <!--  ReSharper restore Xaml.BindingWithContextNotResolved  -->
+                                        <!--  ReSharper restore Xaml.PossibleNullReferenceException  -->
+                                    </DataTemplate>
+                                </ui:FAMenuFlyout.ItemTemplate>
+                            </ui:FAMenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                </Grid>
+
+                <ui:TeachingTip
+                    Name="TeachingTip1"
+                    Title="点击可以启动"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    IsOpen="{Binding IsLaunchTeachingTipsOpen}"
+                    PreferredPlacement="BottomRight"
+                    Target="{Binding #LaunchButtonGrid}" />
+
+                <Grid
+                    x:Name="StopButtonGrid"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    IsVisible="False">
+                    <Button
+                        Width="95"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Stretch"
+                        Classes="danger"
+                        Content="关闭"
+                        IsVisible="True" />
+                    <Button
+                        Width="104"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Stretch"
+                        Classes="danger"
+                        Content="关闭"
+                        IsVisible="True" />
+                </Grid>
+
+                <Button
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Width="48"
+                    Margin="8,0,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Stretch"
+                    FontSize="16">
+                    <ui:SymbolIcon FontSize="16" Symbol="Settings" />
+                </Button>
+            </Grid>
+
+            <ComboBox
+                x:Name="SelectPackageComboBox"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="8,8,0,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                ItemsSource="{Binding InstalledPackages}"
+                SelectedItem="{Binding SelectedPackage}">
+                <ComboBox.Styles>
+                    <Style Selector="ComboBox /template/ ContentControl#ContentPresenter &gt; StackPanel &gt; TextBlock:nth-child(2)">
+                        <Setter Property="IsVisible" Value="False" />
+                    </Style>
+                </ComboBox.Styles>
+
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type system:String}">
+                        <StackPanel Margin="10,0,0,0" VerticalAlignment="Top">
+                            <TextBlock
+                                Name="NameTextBlock"
+                                Margin="0,5,0,5"
+                                Text="{Binding Mode=OneWay}" />
+                            <TextBlock Text="{Binding Mode=OneWay}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <!--  Keyboard button to show manual input info bar  -->
+            <ToggleButton
+                Grid.Column="2"
+                Width="48"
+                Margin="8,8,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Stretch"
+                FontSize="16"
+                IsChecked="{Binding AutoScrollToEnd}"
+                ToolTip.Tip="自动滚动到底部">
+                <avalonia:Icon Value="fa-solid fa-arrow-down-wide-short" />
+            </ToggleButton>
+
+            <ToggleButton
+                Grid.Column="3"
+                Width="48"
+                Margin="8,8,16,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Stretch"
+                FontSize="16"
+                IsChecked="{Binding ShowManualInputPrompt}"
+                ToolTip.Tip="发送">
+                <ui:SymbolIcon FontSize="18" Symbol="Keyboard" />
+            </ToggleButton>
+        </Grid>
+
+        <avaloniaEdit:TextEditor
+            x:Name="Console"
+            Grid.Row="1"
+            Margin="8,8,16,10"
+            Document="{Binding Document}"
+            FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+            IsReadOnly="True"
+            LineNumbersForeground="DarkSlateGray"
+            ShowLineNumbers="True"
+            VerticalScrollBarVisibility="Auto"
+            WordWrap="True" />
+
+        <Grid Grid.Row="1" ColumnDefinitions="0.5*,*">
+            <StackPanel
+                Grid.Column="1"
+                Margin="8"
+                Spacing="4">
+                <!--  Info bar for manual input  -->
+                <ui:InfoBar
+                    Title="输入"
+                    Margin="0"
+                    IsClosable="False"
+                    IsIconVisible="False"
+                    IsOpen="{Binding ShowManualInputPrompt, Mode=TwoWay}"
+                    Severity="Warning">
+                    <ui:InfoBar.ActionButton>
+                        <Grid ColumnDefinitions="*,auto">
+                            <TextBox Name="ManualInputBox" Margin="0,0,8,0" />
+                            <Button
+                                Grid.Column="1"
+                                Margin="0,0,8,0"
+                                Content="发送" />
+                        </Grid>
+                    </ui:InfoBar.ActionButton>
+                </ui:InfoBar>
+                <!--  Info bar for auto prompts  -->
+                <ui:InfoBar
+                    Title="输入要求"
+                    Margin="0"
+                    IsOpen="True"
+                    Message="确认消息"
+                    Severity="Warning">
+                    <ui:InfoBar.ActionButton>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Classes="accent" Content="是" />
+                            <Button Content="否" />
+                        </StackPanel>
+                    </ui:InfoBar.ActionButton>
+                </ui:InfoBar>
+            </StackPanel>
+        </Grid>
+
+        <Button
+            Grid.Row="2"
+            Grid.ColumnSpan="2"
+            Margin="24,0,24,8"
+            HorizontalAlignment="Stretch"
+            Classes="success"
+            Content="打开webui"
+            FontSize="12"
+            IsVisible="True" />
+    </Grid>
+
+</controls:UserControlBase>

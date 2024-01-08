@@ -11,10 +11,10 @@
                         Height="550"
                         Title="AvaloniaOpenBCI - 异常"
                         x:Class="AvaloniaOpenBCI.Views.Dialogs.ExceptionDialog">
-    <Grid RowDefinitions="Auto,*,Auto,*">
-        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="auto,*,auto">
+        <Grid Grid.Row="1" RowDefinitions="auto,*,auto">
             <!--  Info  -->
-            <TextBox
+            <TextBlock
                 Grid.Row="0"
                 Theme="{DynamicResource SubtitleTextBlockStyle}"
                 Margin="16"
@@ -24,9 +24,9 @@
 
             <!--  Exception details  -->
             <DockPanel Grid.Row="1">
-                <Expander
+                <Expander 
                     VerticalAlignment="Top"
-                    Header="{Binding ExceptionType, Mode=OneWay,TargetNullValue=-, FallbackValue=Unknown Exception}"
+                    Header="{Binding ExceptionType, Mode=OneWay, TargetNullValue=-, FallbackValue=Unknown Exception}"
                     IsExpanded="True"
                     Padding="12,12,12,12"
                     Margin="16,0,16,0">
@@ -34,13 +34,13 @@
                         <StackPanel DataContext="{Binding Exception}" Spacing="4">
                             <!--  Exception Message  -->
                             <TextBlock Theme="{DynamicResource BodyStrongTextBlockStyle}" Text="详细信息" />
-                            <SelectableTextBlock Text="{Binding Message}"
+                            <SelectableTextBlock Text="{Binding Message}" 
                                                  TextWrapping="WrapWithOverflow"
                                                  Margin="0,0,0,8"
-                                                 SelectionBrush="DodgerBlue" />
+                                                 SelectionBrush="DodgerBlue"/>
                             <!--  Callstack  -->
                             <TextBlock Theme="{DynamicResource BodyStrongTextBlockStyle}" Text="调用栈" />
-                            <controls:Card
+                            <controls:Card 
                                 Margin="0,0,0,8"
                                 Background="{DynamicResource ComboBoxDropDownBackground}">
                                 <SelectableTextBlock
@@ -81,5 +81,4 @@
                 Padding="8" />
         </Grid>
     </Grid>
-
 </controls:AppWindowBase>

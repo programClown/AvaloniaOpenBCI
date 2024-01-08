@@ -13,6 +13,7 @@ public class AppWindowBase : AppWindow
 {
     public CancellationTokenSource? ShowAsyncCts { get; set; }
 
+    protected AppWindowBase() { }
 
     public void ShowWithCts(CancellationTokenSource cts)
     {
@@ -27,7 +28,13 @@ public class AppWindowBase : AppWindow
         ShowAsyncCts = new CancellationTokenSource();
 
         var tcs = new TaskCompletionSource<bool>();
-        ShowAsyncCts.Token.Register(s => { ((TaskCompletionSource<bool>)s!).SetResult(true); }, tcs);
+        ShowAsyncCts.Token.Register(
+            s =>
+            {
+                ((TaskCompletionSource<bool>)s!).SetResult(true);
+            },
+            tcs
+        );
 
         Show();
 
@@ -55,7 +62,12 @@ public class AppWindowBase : AppWindow
             viewModel.OnLoaded();
 
             // Can't block here so we'll run as async on UI thread
-            Dispatcher.UIThread.InvokeAsync(async () => { await viewModel.OnLoadedAsync(); }).SafeFireAndForget();
+            Dispatcher
+                .UIThread.InvokeAsync(async () =>
+                {
+                    await viewModel.OnLoadedAsync();
+                })
+                .SafeFireAndForget();
         }
     }
 
@@ -64,14 +76,17 @@ public class AppWindowBase : AppWindow
         base.OnUnloaded(e);
 
         if (DataContext is not ViewModelBase viewModel)
-        {
             return;
-        }
 
         // Run synchronous load then async unload
         viewModel.OnUnloaded();
 
         // Can't block here so we'll run as async on UI thread
-        Dispatcher.UIThread.InvokeAsync(async () => { await viewModel.OnUnloadedAsync(); }).SafeFireAndForget();
+        Dispatcher
+            .UIThread.InvokeAsync(async () =>
+            {
+                await viewModel.OnUnloadedAsync();
+            })
+            .SafeFireAndForget();
     }
 }

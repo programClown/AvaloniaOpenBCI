@@ -1,4 +1,11 @@
-﻿using AsyncImageLoader;
+﻿using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using AsyncImageLoader;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -13,13 +20,6 @@ using Projektanker.Icons.Avalonia.FontAwesome;
 using Semver;
 using Serilog;
 using SkiaSharp;
-using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AvaloniaOpenBCI;
 
@@ -48,9 +48,10 @@ internal sealed class Program
             .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
             .CreateLogger();
 
-        LiveCharts.Configure(config =>                                                // mark
+        LiveCharts.Configure(
+            config => // mark
                 config.HasGlobalSKTypeface(SKFontManager.Default.MatchCharacter('汉')) // <- Chinese // mark
-        );                                                                            // mark
+        ); // mark
 
         string? infoVersion = Assembly
             .GetExecutingAssembly()
@@ -67,8 +68,7 @@ internal sealed class Program
 
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
-        BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
     internal static void SetupAvaloniaApp()
@@ -84,50 +84,26 @@ internal sealed class Program
     {
         SetupAvaloniaApp();
 
-        AppBuilder app = AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+        AppBuilder app = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont().LogToTrace();
 
         if (UseOpenGlRendering)
         {
             app = app.With(
-                new Win32PlatformOptions
-                {
-                    RenderingMode = [Win32RenderingMode.Wgl, Win32RenderingMode.Software]
-                }
+                new Win32PlatformOptions { RenderingMode = [Win32RenderingMode.Wgl, Win32RenderingMode.Software] }
             );
         }
 
         if (DisableGpuRendering)
         {
-            app = app.With(new Win32PlatformOptions
-                {
-                    RenderingMode = new[]
-                    {
-                        Win32RenderingMode.Software
-                    }
-                }
-            ).With(new X11PlatformOptions
-                {
-                    RenderingMode = new[]
-                    {
-                        X11RenderingMode.Software
-                    }
-                }
-            ).With(new AvaloniaNativePlatformOptions
-                {
-                    RenderingMode = new[]
-                    {
-                        AvaloniaNativeRenderingMode.Software
-                    }
-                }
-            );
+            app = app.With(new Win32PlatformOptions { RenderingMode = new[] { Win32RenderingMode.Software } })
+                .With(new X11PlatformOptions { RenderingMode = new[] { X11RenderingMode.Software } })
+                .With(
+                    new AvaloniaNativePlatformOptions { RenderingMode = new[] { AvaloniaNativeRenderingMode.Software } }
+                );
         }
 
         return app;
     }
-
 
     private static void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
@@ -150,7 +126,7 @@ internal sealed class Program
         {
             var dialog = new ExceptionDialog { DataContext = new ExceptionViewModel { Exception = ex } };
 
-            Window? mainWindow = lifetime.MainWindow;
+            var mainWindow = lifetime.MainWindow;
             // We can only show dialog if main window exists, and is visible
             if (mainWindow is { PlatformImpl: not null, IsVisible: true })
             {

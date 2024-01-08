@@ -13,6 +13,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using AvaloniaOpenBCI.Helper;
 using AvaloniaOpenBCI.Models.Configs;
+using AvaloniaOpenBCI.Services;
 using AvaloniaOpenBCI.ViewModels;
 using AvaloniaOpenBCI.Views;
 using MessagePipe;
@@ -125,7 +126,18 @@ public class App : Application
         Services = services.BuildServiceProvider();
     }
 
-    internal static IServiceCollection ConfigureServices()
+    private static void ConfigureViewServices(IServiceCollection services)
+    {
+        services.AddSingleton<LaunchPageView>();
+        services.AddSingleton<LaunchPageViewModel>();
+
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<MainWindowViewModel>(
+            provider => new MainWindowViewModel { Pages = { provider.GetRequiredService<LaunchPageViewModel>() } }
+        );
+    }
+
+    private static IServiceCollection ConfigureServices()
     {
         var services = new ServiceCollection();
         services.AddMemoryCache();
@@ -134,9 +146,10 @@ public class App : Application
         services.AddMessagePipe();
         services.AddMessagePipeNamedPipeInterprocess("AvaloniaOpenBCI");
 
-        services.AddSingleton<MainWindow>();
+        services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<INavigationService<MainWindowViewModel>, NavigationService<MainWindowViewModel>>();
 
-        services.AddSingleton<MainWindowViewModel>();
+        ConfigureViewServices(services);
 
         Config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
