@@ -130,10 +130,17 @@ public class App : Application
     {
         services.AddSingleton<LaunchPageView>();
         services.AddSingleton<LaunchPageViewModel>();
+        services.AddSingleton<SettingsPage>();
+        services.AddSingleton<SettingsViewModel>();
 
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>(
-            provider => new MainWindowViewModel { Pages = { provider.GetRequiredService<LaunchPageViewModel>() } }
+            provider =>
+                new MainWindowViewModel
+                {
+                    Pages = { provider.GetRequiredService<LaunchPageViewModel>() },
+                    FooterPages = { provider.GetRequiredService<SettingsViewModel>() }
+                }
         );
     }
 
@@ -148,6 +155,7 @@ public class App : Application
 
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INavigationService<MainWindowViewModel>, NavigationService<MainWindowViewModel>>();
+        services.AddSingleton<INavigationService<SettingsViewModel>, NavigationService<SettingsViewModel>>();
 
         ConfigureViewServices(services);
 

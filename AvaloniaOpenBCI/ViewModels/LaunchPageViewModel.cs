@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using AvaloniaEdit.Document;
+using AvaloniaOpenBCI.Attributes;
 using AvaloniaOpenBCI.ViewModels.Base;
+using AvaloniaOpenBCI.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FluentAvalonia.UI.Controls;
+using Symbol = FluentIcons.Common.Symbol;
+using SymbolIconSource = FluentIcons.FluentAvalonia.SymbolIconSource;
 
 namespace AvaloniaOpenBCI.ViewModels;
 
+[View(typeof(LaunchPageView))]
 public partial class LaunchPageViewModel : PageViewModelBase, IDisposable, IAsyncDisposable
 {
+    public override string Title => "Launch";
+    public override IconSource IconSource => new SymbolIconSource { Symbol = Symbol.Rocket, IsFilled = true };
+
     [ObservableProperty]
     private bool _isLaunchTeachingTipsOpen;
 
@@ -38,9 +46,6 @@ public partial class LaunchPageViewModel : PageViewModelBase, IDisposable, IAsyn
     {
         // TODO 在此释放托管资源
     }
-
-    public override string Title { get; }
-    public override IconSource IconSource { get; }
 
     public List<string> SelectedPackageExtraCommands => new() { "launch", "file", "async" };
 }

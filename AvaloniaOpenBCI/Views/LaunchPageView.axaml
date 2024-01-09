@@ -157,6 +157,7 @@
             </ToggleButton>
         </Grid>
 
+
         <avaloniaEdit:TextEditor
             x:Name="Console"
             Grid.Row="1"

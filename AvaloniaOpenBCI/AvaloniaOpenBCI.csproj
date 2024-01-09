@@ -61,5 +61,6 @@
         <PackageReference Include="LiteDB.Async" Version="0.1.7"/>
         <PackageReference Include="TextMateSharp.Grammars" Version="1.0.56"/>
         <PackageReference Include="SharpCompress" Version="0.34.2"/>
+        <PackageReference Include="SpacedGrid-Avalonia" Version="11.0.0" />
     </ItemGroup>
 </Project>

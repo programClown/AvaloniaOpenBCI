@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -20,6 +21,7 @@ using AvaloniaOpenBCI.Models.Configs;
 using AvaloniaOpenBCI.Services;
 using AvaloniaOpenBCI.ViewModels;
 using AvaloniaOpenBCI.ViewModels.Base;
+using FluentAvalonia.Interop;
 using FluentAvalonia.Styling;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Media;
@@ -211,5 +213,38 @@ public partial class MainWindow : AppWindowBase
 
             _navigationService.NavigateTo(vm, new BetterSlideNavigationTransition());
         }
+    }
+
+    public void SetDefaultFonts()
+    {
+        var fonts = new List<string>();
+
+        if (Compat.IsWindows)
+        {
+            if (OSVersionHelper.IsWindows11())
+            {
+                fonts.Add("Segoe UI Variable Text");
+            }
+            else
+            {
+                fonts.Add("Segoe UI");
+            }
+        }
+        else if (Compat.IsMacOS)
+        {
+            fonts.Add("San Francisco");
+            fonts.Add("Helvetica Neue");
+            fonts.Add("Helvetica");
+        }
+        else
+        {
+            Resources["ContentControlThemeFontFamily"] = FontFamily.Default;
+            FontFamily = FontFamily.Default;
+            return;
+        }
+
+        var fontString = new FontFamily(string.Join(",", fonts));
+        Resources["ContentControlThemeFontFamily"] = fontString;
+        FontFamily = fontString;
     }
 }

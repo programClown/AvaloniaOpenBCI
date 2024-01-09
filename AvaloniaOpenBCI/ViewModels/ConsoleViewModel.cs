@@ -1,4 +1,10 @@
-﻿using Avalonia.Threading;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
+using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaOpenBCI.Extensions;
 using AvaloniaOpenBCI.Processes;
@@ -7,12 +13,6 @@ using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
 using Serilog;
 using Serilog.Events;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace AvaloniaOpenBCI.ViewModels;
 
@@ -42,15 +42,9 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
     /// </summary>
     private int _writeCursor;
 
-    private static ILogger Logger
-    {
-        get => Log.Logger;
-    }
+    private static ILogger Logger => Log.Logger;
 
-    public bool IsUpdatesRunning
-    {
-        get => _updateTask?.IsCompleted == false;
-    }
+    public bool IsUpdatesRunning => _updateTask?.IsCompleted == false;
 
     /// <summary>
     ///     Timeout for acquiring locks on <see cref="_writeCursor" />
@@ -213,8 +207,8 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
         Dispatcher.UIThread.VerifyAccess();
 
         // Get cancellation token
-        CancellationToken ct = _updateCts?.Token ??
-                               throw new InvalidOperationException("Update cancellation token must be set");
+        CancellationToken ct =
+            _updateCts?.Token ?? throw new InvalidOperationException("Update cancellation token must be set");
 
         try
         {
@@ -234,15 +228,16 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
 
                 string outputType = output.IsStdErr ? "stderr" : "stdout";
                 Logger.Debug(
-                    $"Processing: [{outputType}] (Text = {output.Text.ToRepr()}, " +
-                    $"Raw = {output.RawText?.ToRepr()}, " +
-                    $"CarriageReturn = {output.CarriageReturn}, " +
-                    $"CursorUp = {output.CursorUp}, "
+                    $"Processing: [{outputType}] (Text = {output.Text.ToRepr()}, "
+                        + $"Raw = {output.RawText?.ToRepr()}, "
+                        + $"CarriageReturn = {output.CarriageReturn}, "
+                        + $"CursorUp = {output.CursorUp}, "
                 );
 
                 // Link the cancellation token to the write cursor lock timeout
                 CancellationToken linkedCt = CancellationTokenSource
-                    .CreateLinkedTokenSource(ct, WriteCursorLockTimeoutToken).Token;
+                    .CreateLinkedTokenSource(ct, WriteCursorLockTimeoutToken)
+                    .Token;
 
                 using (await _writeCursorLock.LockAsync(linkedCt))
                 {
@@ -283,8 +278,8 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
             if (lineStartOffset == _writeCursor)
             {
                 Logger.Debug(
-                    $"Cursor already at start for carriage return " +
-                    $"(offset = {lineStartOffset}, line = {currentLine.LineNumber})"
+                    $"Cursor already at start for carriage return "
+                        + $"(offset = {lineStartOffset}, line = {currentLine.LineNumber})"
                 );
             }
             else
@@ -295,9 +290,7 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
                 int lineLength = lineEndOffset - lineStartOffset;
                 Document.Remove(lineStartOffset, lineLength);
 
-                Logger.Debug(
-                    $"Moving cursor to start for carriage return " + $"({_writeCursor} -> {lineStartOffset})"
-                );
+                Logger.Debug($"Moving cursor to start for carriage return " + $"({_writeCursor} -> {lineStartOffset})");
                 _writeCursor = lineStartOffset;
             }
         }
@@ -327,8 +320,8 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
 
                 // Update cursor to target offset
                 Logger.Debug(
-                    $"Cursor up: Moving (line {currentLocation.Line}, {_writeCursor})" +
-                    $" -> (line {targetLocation.Line}, {targetOffset})"
+                    $"Cursor up: Moving (line {currentLocation.Line}, {_writeCursor})"
+                        + $" -> (line {targetLocation.Line}, {targetOffset})"
                 );
 
                 _writeCursor = targetOffset;
@@ -369,18 +362,14 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
             if (currentLine.LineNumber < Document.LineCount)
             {
                 DocumentLine? nextLine = Document.GetLineByNumber(currentLine.LineNumber + 1);
-                Logger.Debug(
-                    $"Moving cursor to start of next line " + $"({_writeCursor} -> {nextLine.Offset})"
-                );
+                Logger.Debug($"Moving cursor to start of next line " + $"({_writeCursor} -> {nextLine.Offset})");
                 _writeCursor = nextLine.Offset;
             }
             else
             {
                 // Otherwise move to end of current line, and direct insert a newline
                 int lineEndOffset = currentLine.EndOffset;
-                Logger.Debug(
-                    $"Moving cursor to end of current line " + $"({_writeCursor} -> {lineEndOffset})"
-                );
+                Logger.Debug($"Moving cursor to end of current line " + $"({_writeCursor} -> {lineEndOffset})");
                 _writeCursor = lineEndOffset;
                 DirectWriteToConsole(Environment.NewLine);
             }
@@ -402,9 +391,9 @@ public partial class ConsoleViewModel : ObservableObject, IDisposable, IAsyncDis
             {
                 string newText = text[..replaceLength];
                 Logger.Debug(
-                    $"Replacing: (cursor = {_writeCursor}, length = {replaceLength}, " +
-                    $"text = {Document.GetText(_writeCursor, replaceLength).ToRepr()} " +
-                    $"-> {newText.ToRepr()})"
+                    $"Replacing: (cursor = {_writeCursor}, length = {replaceLength}, "
+                        + $"text = {Document.GetText(_writeCursor, replaceLength).ToRepr()} "
+                        + $"-> {newText.ToRepr()})"
                 );
 
                 Document.Replace(_writeCursor, replaceLength, newText);

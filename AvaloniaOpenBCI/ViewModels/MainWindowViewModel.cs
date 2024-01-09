@@ -2,13 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using AvaloniaOpenBCI.Attributes;
 using AvaloniaOpenBCI.Helper;
 using AvaloniaOpenBCI.ViewModels.Base;
+using AvaloniaOpenBCI.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Serilog;
 
 namespace AvaloniaOpenBCI.ViewModels;
 
+[View(typeof(MainWindow))]
 public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty]

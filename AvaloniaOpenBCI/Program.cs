@@ -84,7 +84,12 @@ internal sealed class Program
     {
         SetupAvaloniaApp();
 
-        AppBuilder app = AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont().LogToTrace();
+        AppBuilder app = AppBuilder
+            .Configure<App>()
+            .UseAliBabaFontFamily()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
 
         if (UseOpenGlRendering)
         {
