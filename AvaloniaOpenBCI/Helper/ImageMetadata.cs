@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,49 +12,42 @@ namespace AvaloniaOpenBCI.Helper;
 
 public class ImageMetadata
 {
-    readonly private static byte[] PngHeader = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-    readonly private static byte[] Idat = "IDAT"u8.ToArray();
-    readonly private static byte[] Text = "tEXt"u8.ToArray();
+    private static readonly byte[] PngHeader = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+    private static readonly byte[] Idat = "IDAT"u8.ToArray();
+    private static readonly byte[] Text = "tEXt"u8.ToArray();
 
     private IReadOnlyList<Directory>? Directories { get; set; }
 
-
     public static ImageMetadata ParseFile(FilePath path) =>
-        new()
-        {
-            Directories = ImageMetadataReader.ReadMetadata(path)
-        };
+        new() { Directories = ImageMetadataReader.ReadMetadata(path) };
 
     public static ImageMetadata ParseFile(Stream stream) =>
-        new()
-        {
-            Directories = ImageMetadataReader.ReadMetadata(stream)
-        };
+        new() { Directories = ImageMetadataReader.ReadMetadata(stream) };
 
-    public Size? GetImageSize()
+    public System.Drawing.Size? GetImageSize()
     {
         if (Directories?.OfType<PngDirectory>().FirstOrDefault() is { } header)
         {
             header.TryGetInt32(PngDirectory.TagImageWidth, out var width);
             header.TryGetInt32(PngDirectory.TagImageHeight, out var height);
 
-            return new Size(width, height);
+            return new System.Drawing.Size(width, height);
         }
 
         return null;
     }
 
-    public static Size GetImageSize(byte[] inputImage)
+    public static System.Drawing.Size GetImageSize(byte[] inputImage)
     {
         var imageWidthBytes = inputImage[0x10..0x14];
         var imageHeightBytes = inputImage[0x14..0x18];
         var imageWidth = BitConverter.ToInt32(imageWidthBytes.Reverse().ToArray());
         var imageHeight = BitConverter.ToInt32(imageHeightBytes.Reverse().ToArray());
 
-        return new Size(imageWidth, imageHeight);
+        return new System.Drawing.Size(imageWidth, imageHeight);
     }
 
-    public static Size GetImageSize(BinaryReader reader)
+    public static System.Drawing.Size GetImageSize(BinaryReader reader)
     {
         var oldPosition = reader.BaseStream.Position;
 
@@ -68,7 +60,7 @@ public class ImageMetadata
 
         reader.BaseStream.Position = oldPosition;
 
-        return new Size(imageWidth, imageHeight);
+        return new System.Drawing.Size(imageWidth, imageHeight);
     }
 
     public static (
@@ -76,7 +68,7 @@ public class ImageMetadata
         string? ParametersJson,
         string? SMProject,
         string? ComfyNodes
-        ) GetAllFileMetadata(FilePath filePath)
+    ) GetAllFileMetadata(FilePath filePath)
     {
         using FileStream stream = filePath.Info.OpenRead();
         using var reader = new BinaryReader(stream);
@@ -102,7 +94,6 @@ public class ImageMetadata
             .SelectMany(d => d.Tags)
             .Where(t => t.Name == "Textual Data");
     }
-
 
     public static string ReadTextChunk(BinaryReader byteStream, string key)
     {

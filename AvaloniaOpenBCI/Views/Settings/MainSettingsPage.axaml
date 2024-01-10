@@ -5,9 +5,15 @@
     xmlns:controls="clr-namespace:AvaloniaOpenBCI.Controls"
     xmlns:converters="clr-namespace:AvaloniaOpenBCI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fluentIcons="clr-namespace:FluentIcons.FluentAvalonia;assembly=FluentIcons.FluentAvalonia"
+    xmlns:hardwareInfo="using:AvaloniaOpenBCI.Helper.HardwareInfo"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="450"
+    xmlns:sg="clr-namespace:SpacedGridControl.Avalonia;assembly=SpacedGridControl.Avalonia"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vmSettings="using:AvaloniaOpenBCI.ViewModels.Settings"
+    d:DesignHeight="550"
     d:DesignWidth="800"
+    x:DataType="vmSettings:MainSettingsViewModel"
     mc:Ignorable="d">
 
     <controls:UserControlBase.Resources>
@@ -16,5 +22,378 @@
     </controls:UserControlBase.Resources>
 
     <controls:UserControlBase.Styles>
+        <Style Selector="sg|SpacedGrid &gt; ui|SettingsExpander">
+            <Setter Property="Margin" Value="8,0" />
+        </Style>
     </controls:UserControlBase.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="8,16" Spacing="8">
+
+            <!--  Theme  -->
+            <Grid RowDefinitions="Auto,*,*">
+                <TextBlock
+                    Margin="0,0,0,8"
+                    FontWeight="Medium"
+                    Text="外观" />
+                <ui:SettingsExpander
+                    Grid.Row="1"
+                    Margin="8,0,8,4"
+                    Header="主题"
+                    IconSource="WeatherMoon">
+                    <ui:SettingsExpander.Footer>
+                        <ComboBox
+                            MinWidth="100"
+                            ItemsSource="{Binding AvailableThemes}"
+                            SelectedItem="{Binding SelectedTheme}" />
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+                <ui:SettingsExpander
+                    Grid.Row="2"
+                    Margin="8,0,8,4"
+                    Header="语言"
+                    IconSource="Character">
+                    <ui:SettingsExpander.Footer>
+                        <ComboBox
+                            MinWidth="100"
+                            DisplayMemberBinding="{Binding Converter={StaticResource CultureInfoDisplayConverter}}"
+                            ItemsSource="{Binding AvailableLanguages}"
+                            SelectedItem="{Binding SelectedLanguage}" />
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+            </Grid>
+
+            <!--  General  -->
+            <sg:SpacedGrid RowDefinitions="Auto,*,*" RowSpacing="4">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="Medium"
+                    Text="通用" />
+                <ui:SettingsExpander
+                    Grid.Row="1"
+                    Margin="8,0"
+                    ActionIconSource="ChevronRight"
+                    Header="引擎"
+                    IsClickEnabled="True">
+                    <ui:SettingsExpander.IconSource>
+                        <fluentIcons:SymbolIconSource
+                            FontSize="10"
+                            IsFilled="True"
+                            Symbol="AppGeneric" />
+                    </ui:SettingsExpander.IconSource>
+                </ui:SettingsExpander>
+                <ui:SettingsExpander Grid.Row="2" Header="节假日">
+                    <ui:SettingsExpander.IconSource>
+                        <fluentIcons:SymbolIconSource
+                            FontSize="10"
+                            IsFilled="True"
+                            Symbol="WeatherSnowflake" />
+                    </ui:SettingsExpander.IconSource>
+                    <ui:SettingsExpander.Footer>
+                        <ui:FAComboBox ItemsSource="{Binding HolidayModes}" SelectedItem="{Binding HolidayModeSetting}">
+                        </ui:FAComboBox>
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+            </sg:SpacedGrid>
+
+            <!--  Environment Options  -->
+            <Grid RowDefinitions="Auto,Auto,Auto">
+                <TextBlock
+                    Margin="0,0,0,8"
+                    FontWeight="Medium"
+                    Text="软件环境" />
+
+                <ui:SettingsExpander
+                    Grid.Row="1"
+                    Margin="8,4"
+                    Header="环境变量"
+                    IconSource="OtherUser">
+                    <ui:SettingsExpander.Footer>
+                        <Button Command="{Binding OpenEnvVarsDialogCommand}" Content="编辑" />
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+
+                <ui:SettingsExpander
+                    Grid.Row="2"
+                    Margin="8,4"
+                    Header="内建Python">
+                    <ui:SettingsExpander.IconSource>
+                        <controls:FASymbolIconSource Symbol="fa-brands fa-python" />
+                    </ui:SettingsExpander.IconSource>
+                    <ui:SettingsExpander.Footer>
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <controls:ProgressRing
+                                BorderThickness="3"
+                                IsEnabled="False"
+                                IsIndeterminate="True"
+                                IsVisible="True" />
+                            <Button Content="检查Python更新" />
+                        </StackPanel>
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+            </Grid>
+
+            <!--  user manager  -->
+            <sg:SpacedGrid RowDefinitions="Auto,*,*" RowSpacing="4">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="Medium"
+                    Text="用户" />
+                <ui:SettingsExpander
+                    Grid.Row="1"
+                    Margin="8,0"
+                    ActionIconSource="ChevronRight"
+                    Header="当前用户"
+                    IsClickEnabled="True">
+                    <ui:SettingsExpander.IconSource>
+                        <fluentIcons:SymbolIconSource
+                            FontSize="10"
+                            IsFilled="True"
+                            Symbol="Person" />
+                    </ui:SettingsExpander.IconSource>
+                </ui:SettingsExpander>
+                <ui:SettingsExpander
+                    Grid.Row="2"
+                    Margin="8,0,8,4"
+                    Header="来聊">
+                    <ui:SettingsExpander.IconSource>
+                        <controls:FASymbolIconSource Symbol="fa-brands fa-discord" />
+                    </ui:SettingsExpander.IconSource>
+                    <ui:SettingsExpander.Footer>
+                        <ToggleSwitch IsChecked="True" />
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+            </sg:SpacedGrid>
+
+            <!--  System Options  -->
+            <sg:SpacedGrid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="Medium"
+                    Text="系统" />
+
+                <!--  Updates page  -->
+                <ui:SettingsExpander
+                    Grid.Row="1"
+                    ActionIconSource="ChevronRight"
+                    Header="更新"
+                    IsClickEnabled="True">
+                    <ui:SettingsExpander.IconSource>
+                        <fluentIcons:SymbolIconSource
+                            FontSize="10"
+                            IsFilled="True"
+                            Symbol="ArrowSync" />
+                    </ui:SettingsExpander.IconSource>
+                </ui:SettingsExpander>
+
+                <ui:SettingsExpander
+                    Grid.Row="2"
+                    Description="使用当前程序的位置，如果应用程序移动了，可以再次运行此功能"
+                    Header="添加到开始菜单"
+                    IconSource="StarAdd"
+                    ToolTip.Tip="{OnPlatform Default=只能Windows系统,
+                                             Windows={x:Null}}">
+                    <ui:SettingsExpander.Footer>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <controls:ProgressRing
+                                BorderThickness="3"
+                                IsEnabled="{Binding IsVisible, RelativeSource={RelativeSource Self}}"
+                                IsIndeterminate="True">
+                                <controls:ProgressRing.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                                        <Binding Path="AddToStartMenuCommand.IsRunning" />
+                                        <Binding Path="AddToGlobalStartMenuCommand.IsRunning" />
+                                    </MultiBinding>
+                                </controls:ProgressRing.IsVisible>
+                            </controls:ProgressRing>
+
+                            <SplitButton
+                                Command="{Binding AddToStartMenuCommand}"
+                                Content="为当前用户添加"
+                                IsEnabled="{OnPlatform Default=False,
+                                                       Windows=True}">
+                                <SplitButton.Flyout>
+                                    <ui:FAMenuFlyout Placement="Bottom">
+                                        <ui:MenuFlyoutItem
+                                            Command="{Binding AddToGlobalStartMenuCommand}"
+                                            IconSource="Admin"
+                                            Text="为所有用户添加" />
+                                    </ui:FAMenuFlyout>
+                                </SplitButton.Flyout>
+                            </SplitButton>
+                        </StackPanel>
+                    </ui:SettingsExpander.Footer>
+                </ui:SettingsExpander>
+
+                <ui:SettingsExpander Grid.Row="3" Header="系统信息">
+                    <ui:SettingsExpander.IconSource>
+                        <fluentIcons:SymbolIconSource
+                            FontSize="10"
+                            IsFilled="True"
+                            Symbol="Info">
+                        </fluentIcons:SymbolIconSource>
+                    </ui:SettingsExpander.IconSource>
+
+                    <!--  Cpu  -->
+                    <ui:SettingsExpanderItem>
+                        <ui:SettingsExpanderItem.IconSource>
+                            <controls:FASymbolIconSource
+                                FontSize="10"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Symbol="fa-solid fa-microchip" />
+                        </ui:SettingsExpanderItem.IconSource>
+
+                        <sg:SpacedGrid
+                            ColumnDefinitions="Auto,Auto"
+                            ColumnSpacing="16"
+                            DataContext="{Binding CpuInfoAsync^}"
+                            RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="CPU" />
+                            <SelectableTextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Foreground="{DynamicResource TextControlPlaceholderForeground}"
+                                Text="{Binding ProcessorCaption}"
+                                TextWrapping="WrapWithOverflow" />
+                        </sg:SpacedGrid>
+                    </ui:SettingsExpanderItem>
+
+                    <!--  Memory  -->
+                    <ui:SettingsExpanderItem>
+                        <ui:SettingsExpanderItem.IconSource>
+                            <controls:FASymbolIconSource
+                                FontSize="10"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Symbol="fa-solid fa-memory" />
+                        </ui:SettingsExpanderItem.IconSource>
+
+                        <sg:SpacedGrid
+                            ColumnDefinitions="Auto,Auto"
+                            ColumnSpacing="16"
+                            DataContext="{Binding MemoryInfo}"
+                            RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="Total Memory" />
+                            <SelectableTextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Foreground="{DynamicResource TextControlPlaceholderForeground}"
+                                TextWrapping="WrapWithOverflow">
+                                <SelectableTextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} ({1} usable)">
+                                        <Binding Converter="{x:Static converters:StringFormatConverters.MemoryBytes}" Path="TotalInstalledBytes" />
+                                        <Binding Converter="{x:Static converters:StringFormatConverters.MemoryBytes}" Path="TotalPhysicalBytes" />
+                                    </MultiBinding>
+                                </SelectableTextBlock.Text>
+                            </SelectableTextBlock>
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Available Memory" />
+                            <SelectableTextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Foreground="{DynamicResource TextControlPlaceholderForeground}"
+                                Text="{Binding AvailablePhysicalBytes, Converter={x:Static converters:StringFormatConverters.MemoryBytes}}"
+                                TextWrapping="WrapWithOverflow" />
+                        </sg:SpacedGrid>
+
+                    </ui:SettingsExpanderItem>
+
+                    <!--  GPUs  -->
+                    <ui:SettingsExpanderItem>
+                        <ui:SettingsExpanderItem.IconSource>
+                            <controls:FASymbolIconSource
+                                FontSize="10"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Symbol="fa-solid fa-tachograph-digital" />
+                        </ui:SettingsExpanderItem.IconSource>
+                        <ItemsControl ItemsSource="{Binding GpuInfos}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="hardwareInfo:GpuInfo">
+                                    <sg:SpacedGrid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto">
+                                        <TextBlock Text="{Binding Index, StringFormat={}{0}, Converter={StaticResource IndexPlusOneConverter}}" Theme="{DynamicResource BodyStrongTextBlockStyle}" />
+                                        <SelectableTextBlock
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Text="{Binding Name}" />
+                                        <SelectableTextBlock
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Grid.ColumnSpan="2"
+                                            Foreground="{DynamicResource TextControlPlaceholderForeground}"
+                                            IsVisible="{Binding !!MemoryBytes}"
+                                            Text="{Binding MemoryBytes, Converter={x:Static converters:StringFormatConverters.MemoryBytes}}"
+                                            TextWrapping="WrapWithOverflow" />
+                                    </sg:SpacedGrid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="8" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                        </ItemsControl>
+
+                    </ui:SettingsExpanderItem>
+
+                </ui:SettingsExpander>
+            </sg:SpacedGrid>
+
+            <!--  TODO: Directories card  -->
+
+            <Grid RowDefinitions="auto,*">
+                <StackPanel
+                    Grid.Row="1"
+                    HorizontalAlignment="Left"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="0,8"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Text="关于" />
+                    <Image
+                        Width="112"
+                        Height="112"
+                        Margin="8"
+                        HorizontalAlignment="Left"
+                        Source="/Assets/app-icon.ico" />
+                    <TextBlock
+                        Margin="8"
+                        FontWeight="Medium"
+                        Text="AvaloniaOpenBCI软件" />
+                    <Panel>
+                        <Button
+                            Name="VersionButton"
+                            Margin="8,0,8,8"
+                            Padding="2,0,2,0"
+                            BorderThickness="0"
+                            Classes="transparent"
+                            Command="{Binding OnVersionClick}"
+                            Content="{Binding AppVersion}" />
+                        <ui:TeachingTip
+                            Title="{Binding VersionFlyoutText}"
+                            IsOpen="{Binding IsVersionTapTeachingTipOpen}"
+                            PreferredPlacement="RightTop"
+                            Target="{Binding #VersionButton}" />
+                    </Panel>
+
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                        <Button
+                            Margin="8"
+                            HorizontalAlignment="Left"
+                            Command="{Binding ShowLicensesDialogCommand}"
+                            Content="许可与开源告示" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!--  Extra space at the bottom  -->
+            <Panel Margin="0,0,0,16" />
+
+        </StackPanel>
+    </ScrollViewer>
+
 </controls:UserControlBase>
