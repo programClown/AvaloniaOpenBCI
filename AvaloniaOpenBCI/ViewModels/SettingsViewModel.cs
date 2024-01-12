@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using AvaloniaEdit.Utils;
 using AvaloniaOpenBCI.Attributes;
 using AvaloniaOpenBCI.ViewModels.Base;
+using AvaloniaOpenBCI.ViewModels.Settings;
 using AvaloniaOpenBCI.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FluentAvalonia.UI.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using Symbol = FluentIcons.Common.Symbol;
 using SymbolIconSource = FluentIcons.FluentAvalonia.SymbolIconSource;
 
@@ -25,5 +28,12 @@ public partial class SettingsViewModel : PageViewModelBase
     [ObservableProperty]
     private PageViewModelBase? _currentPage;
 
-    public SettingsViewModel() { }
+    public SettingsViewModel()
+    {
+        SubPages = new PageViewModelBase[] { App.Services.GetRequiredService<MainSettingsViewModel>() };
+
+        CurrentPagePath.AddRange(SubPages);
+
+        CurrentPage = SubPages[0];
+    }
 }

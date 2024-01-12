@@ -15,7 +15,9 @@ using AvaloniaOpenBCI.Helper;
 using AvaloniaOpenBCI.Models.Configs;
 using AvaloniaOpenBCI.Services;
 using AvaloniaOpenBCI.ViewModels;
+using AvaloniaOpenBCI.ViewModels.Settings;
 using AvaloniaOpenBCI.Views;
+using AvaloniaOpenBCI.Views.Settings;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -128,8 +130,16 @@ public class App : Application
 
     private static void ConfigureViewServices(IServiceCollection services)
     {
+        services.AddSingleton<INavigationService<MainWindowViewModel>, NavigationService<MainWindowViewModel>>();
+        services.AddSingleton<INavigationService<SettingsViewModel>, NavigationService<SettingsViewModel>>();
+
         services.AddSingleton<LaunchPageView>();
         services.AddSingleton<LaunchPageViewModel>();
+        services.AddSingleton<OutputsPage>();
+        services.AddSingleton<OutputsPageViewModel>();
+
+        services.AddSingleton<MainSettingsPage>();
+        services.AddSingleton<MainSettingsViewModel>();
         services.AddSingleton<SettingsPage>();
         services.AddSingleton<SettingsViewModel>();
 
@@ -138,7 +148,11 @@ public class App : Application
             provider =>
                 new MainWindowViewModel
                 {
-                    Pages = { provider.GetRequiredService<LaunchPageViewModel>() },
+                    Pages =
+                    {
+                        provider.GetRequiredService<LaunchPageViewModel>(),
+                        provider.GetRequiredService<OutputsPageViewModel>(),
+                    },
                     FooterPages = { provider.GetRequiredService<SettingsViewModel>() }
                 }
         );
@@ -154,8 +168,6 @@ public class App : Application
         services.AddMessagePipeNamedPipeInterprocess("AvaloniaOpenBCI");
 
         services.AddSingleton<INotificationService, NotificationService>();
-        services.AddSingleton<INavigationService<MainWindowViewModel>, NavigationService<MainWindowViewModel>>();
-        services.AddSingleton<INavigationService<SettingsViewModel>, NavigationService<SettingsViewModel>>();
 
         ConfigureViewServices(services);
 
