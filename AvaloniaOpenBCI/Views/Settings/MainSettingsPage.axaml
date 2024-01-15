@@ -143,6 +143,8 @@
                     Grid.Row="1"
                     Margin="8,0"
                     ActionIconSource="ChevronRight"
+                    Command="{Binding NavigateToSubPageCommand}"
+                    CommandParameter="{x:Type vmSettings:AccountSettingsViewModel}"
                     Header="当前用户"
                     IsClickEnabled="True">
                     <ui:SettingsExpander.IconSource>

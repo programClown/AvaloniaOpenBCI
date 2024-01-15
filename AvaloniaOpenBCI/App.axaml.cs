@@ -140,6 +140,8 @@ public class App : Application
 
         services.AddSingleton<MainSettingsPage>();
         services.AddSingleton<MainSettingsViewModel>();
+        services.AddSingleton<AccountSettingsPage>();
+        services.AddSingleton<AccountSettingsViewModel>();
         services.AddSingleton<SettingsPage>();
         services.AddSingleton<SettingsViewModel>();
 

@@ -6,7 +6,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls.Notifications;
+using Avalonia.Styling;
+using Avalonia.Threading;
+using AvaloniaOpenBCI.Animations;
 using AvaloniaOpenBCI.Attributes;
 using AvaloniaOpenBCI.Controls;
 using AvaloniaOpenBCI.Extensions;
@@ -80,6 +84,19 @@ public partial class MainSettingsViewModel : PageViewModelBase
 
         SelectedTheme = AvailableThemes.Last();
         SelectedLanguage = AvailableLanguages[0];
+    }
+
+    partial void OnSelectedThemeChanged(string? value)
+    {
+        if (Application.Current is null)
+            return;
+
+        Application.Current.RequestedThemeVariant = value switch
+        {
+            "Dark" => ThemeVariant.Dark,
+            "Light" => ThemeVariant.Light,
+            _ => ThemeVariant.Default
+        };
     }
 
     [RelayCommand]
@@ -245,6 +262,19 @@ public partial class MainSettingsViewModel : PageViewModelBase
         {
             _notificationService.Show("Failed to read licenses information", $"{e}", NotificationType.Error);
         }
+    }
+
+    [RelayCommand]
+    public void NavigateToSubPageCommand(Type viewModelType)
+    {
+        Dispatcher.UIThread.Post(
+            () =>
+                _settingsNavigationService.NavigateTo(
+                    viewModelType,
+                    BetterSlideNavigationTransition.PageSlideFromRight
+                ),
+            DispatcherPriority.Send
+        );
     }
 
     private static string GetLicensesMarkdown()
