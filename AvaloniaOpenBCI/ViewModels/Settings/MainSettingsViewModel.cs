@@ -19,6 +19,8 @@ using AvaloniaOpenBCI.Helper.HardwareInfo;
 using AvaloniaOpenBCI.Models.FileInterfaces;
 using AvaloniaOpenBCI.Services;
 using AvaloniaOpenBCI.ViewModels.Base;
+using AvaloniaOpenBCI.ViewModels.Dialogs;
+using AvaloniaOpenBCI.Views.Dialogs;
 using AvaloniaOpenBCI.Views.Settings;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -102,18 +104,17 @@ public partial class MainSettingsViewModel : PageViewModelBase
     [RelayCommand]
     private async Task OpenEnvVarsDialog()
     {
+        var viewModel = new EnvVarsViewModel();
+
         var dialog = new BetterContentDialog()
         {
-            Content = "Env Variables",
+            Content = new EnvVarsDialog() { DataContext = viewModel },
             PrimaryButtonText = "保存",
             IsPrimaryButtonEnabled = true,
             CloseButtonText = "取消"
         };
 
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-        {
-            ;
-        }
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary) { }
     }
 
     /// <summary>

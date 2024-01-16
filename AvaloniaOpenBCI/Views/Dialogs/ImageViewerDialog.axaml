@@ -1,0 +1,174 @@
+﻿<controls:UserControlBase
+    x:Class="AvaloniaOpenBCI.Views.Dialogs.ImageViewerDialog"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:AvaloniaOpenBCI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:icons="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    xmlns:vmDialogs="clr-namespace:AvaloniaOpenBCI.ViewModels.Dialogs"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vmDialogs:ImageViewerViewModel"
+    mc:Ignorable="d">
+
+    <controls:UserControlBase.KeyBindings>
+        <KeyBinding Command="{Binding NavigateNextCommand}" Gesture="Down" />
+        <KeyBinding Command="{Binding NavigateNextCommand}" Gesture="Right" />
+        <KeyBinding Command="{Binding NavigatePreviousCommand}" Gesture="Up" />
+        <KeyBinding Command="{Binding NavigatePreviousCommand}" Gesture="Left" />
+    </controls:UserControlBase.KeyBindings>
+
+    <controls:UserControlBase.ContextFlyout>
+        <controls:BetterFlyout Placement="Left">
+            <StackPanel>
+                <TextBlock Text="{Binding LocalImageFile.FileName}" />
+                <TextBlock Text="{Binding LocalImageFile.ImageSize}" />
+            </StackPanel>
+        </controls:BetterFlyout>
+    </controls:UserControlBase.ContextFlyout>
+
+    <controls:UserControlBase.Styles>
+        <Style Selector="SelectableTextBlock">
+            <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+            <Setter Property="SelectionBrush" Value="{DynamicResource CompletionSelectionForegroundBrush}" />
+        </Style>
+    </controls:UserControlBase.Styles>
+
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        RowDefinitions="*,Auto">
+        <controls:AdvancedImageBox
+            Name="ImageBox"
+            Image="{Binding Bitmap}"
+            SizeMode="Fit">
+            <controls:AdvancedImageBox.ContextFlyout>
+                <ui:FAMenuFlyout>
+                    <ui:MenuFlyoutItem
+                        x:Name="CopyMenuItem"
+                        Command="{Binding CopyImageCommand}"
+                        CommandParameter="{Binding #ImageBox.Image}"
+                        HotKey="Ctrl+C"
+                        IconSource="Copy"
+                        IsEnabled="{OnPlatform Windows=True,
+                                               Default=False}"
+                        Text="复制" />
+                </ui:FAMenuFlyout>
+            </controls:AdvancedImageBox.ContextFlyout>
+        </controls:AdvancedImageBox>
+
+        <!--  Info Button  -->
+        <Grid
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
+            <Button
+                x:Name="InfoButton"
+                Grid.Row="0"
+                Margin="8,8,0,0"
+                Padding="8"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                icons:Attached.Icon="fa-solid fa-info"
+                Classes="transparent-full"
+                Tapped="InfoButton_OnTapped" />
+        </Grid>
+
+        <ui:TeachingTip
+            x:Name="InfoTeachingTip"
+            Grid.Row="0"
+            MinWidth="100"
+            PlacementMargin="16,0,16,0"
+            PreferredPlacement="LeftBottom"
+            TailVisibility="{Binding #InfoButton}">
+            <StackPanel Margin="4,0" DataContext="{Binding LocalImageFile}">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Text="文件名" Theme="{DynamicResource BodyStrongTextBlockStyle}" />
+                    <SelectableTextBlock Grid.Row="1" Text="{Binding FileName}" />
+                </Grid>
+
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Text="创建时间" Theme="{DynamicResource BodyStrongTextBlockStyle}" />
+                    <SelectableTextBlock Grid.Row="1" Text="{Binding CreatedAt}" />
+                </Grid>
+
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Text="修改时间" Theme="{DynamicResource BodyStrongTextBlockStyle}" />
+                    <SelectableTextBlock Grid.Row="1" Text="{Binding LastModifiedAt}" />
+                </Grid>
+            </StackPanel>
+        </ui:TeachingTip>
+
+        <!--  Close button  -->
+        <Grid
+            Grid.Row="0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top">
+            <Button
+                Margin="0,8,8,0"
+                Padding="8"
+                icons:Attached.Icon="fa-solid fa-xmark"
+                Classes="transparent-full"
+                Command="{Binding OnCloseButtonClick}" />
+        </Grid>
+
+        <!--  Footer  -->
+        <!--<Border
+            Grid.Row="1"
+            MinHeight="20"
+            Background="Transparent"
+            VerticalAlignment="Bottom"
+            Opacity="0.9">
+            <UniformGrid Margin="4" Columns="3">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    FontSize="13"
+                    Text="{Binding ImageSizeText}" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    Text="{Binding FileNameText}"
+                    TextAlignment="Center" />
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    FontSize="13"
+                    Text="{Binding FileSizeText}" />
+            </UniformGrid>
+        </Border>-->
+        <ExperimentalAcrylicBorder
+            Grid.Row="1"
+            Padding="4,0,4,0"
+            VerticalAlignment="Bottom"
+            Material="{StaticResource OpaqueDarkAcrylicMaterial}">
+            <UniformGrid Margin="4" Columns="3">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    FontSize="13"
+                    Text="{Binding ImageSizeText}" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    Text="{Binding FileNameText}"
+                    TextAlignment="Center" />
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    FontSize="13"
+                    Text="{Binding FileSizeText}" />
+            </UniformGrid>
+        </ExperimentalAcrylicBorder>
+
+        <!--  The preview tracker  -->
+        <!--<Image
+            MinHeight="100"
+            MinWidth="100"
+            RenderOptions.BitmapInterpolationMode="HighQuality"
+            Source="{Binding #MainImageBox.TrackerImage}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"/>-->
+
+    </Grid>
+</controls:UserControlBase>

@@ -30,10 +30,33 @@ public partial class SettingsViewModel : PageViewModelBase
 
     public SettingsViewModel()
     {
-        SubPages = new PageViewModelBase[] { App.Services.GetRequiredService<MainSettingsViewModel>() };
+        SubPages = new PageViewModelBase[]
+        {
+            App.Services.GetRequiredService<MainSettingsViewModel>(),
+            App.Services.GetRequiredService<AccountSettingsViewModel>()
+        };
 
         CurrentPagePath.AddRange(SubPages);
 
         CurrentPage = SubPages[0];
+    }
+
+    partial void OnCurrentPageChanged(PageViewModelBase? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        if (value is MainSettingsViewModel)
+        {
+            CurrentPagePath.Clear();
+            CurrentPagePath.Add(value);
+        }
+        else
+        {
+            CurrentPagePath.Clear();
+            CurrentPagePath.AddRange(new[] { SubPages[0], value });
+        }
     }
 }
