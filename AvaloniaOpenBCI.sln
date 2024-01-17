@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaOpenBCI", "AvaloniaOpenBCI\AvaloniaOpenBCI.csproj", "{B48C1141-CD85-4263-B4EF-304C21905914}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaviAvalonia", "NaviAvalonia\NaviAvalonia.csproj", "{ED812654-D4AC-4835-BB89-9B0DE86A1576}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{B48C1141-CD85-4263-B4EF-304C21905914}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B48C1141-CD85-4263-B4EF-304C21905914}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B48C1141-CD85-4263-B4EF-304C21905914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED812654-D4AC-4835-BB89-9B0DE86A1576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED812654-D4AC-4835-BB89-9B0DE86A1576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED812654-D4AC-4835-BB89-9B0DE86A1576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED812654-D4AC-4835-BB89-9B0DE86A1576}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
