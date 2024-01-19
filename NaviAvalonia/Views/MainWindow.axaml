@@ -4,20 +4,36 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:NaviAvalonia.ViewModels"
+    xmlns:views="clr-namespace:NaviAvalonia.Views"
+    xmlns:vm="using:NaviAvalonia.ViewModels.Root"
     xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
     Title="NaviAvalonia"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    x:DataType="vm:MainWindowViewModel"
+    x:DataType="vm:RootViewModel"
     Icon="/Assets/application.ico"
+    PointerReleased="InputElement_OnPointerReleased"
     mc:Ignorable="d">
 
+    <windowing:AppWindow.Styles>
+        <Styles>
+            <Style Selector="Border#TitleBarContainer">
+                <Setter Property="MinHeight" Value="40">
+                </Setter>
+            </Style>
+            <Style Selector="windowing|AppWindow:windows Border#TitleBarContainer">
+                <Setter Property="Margin" Value="0 0 138 0">
+                </Setter>
+            </Style>
+        </Styles>
+    </windowing:AppWindow.Styles>
 
-
-    <TextBlock
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Text="{Binding Greeting}" />
-
+    <Panel Name="RootPanel">
+        <DockPanel>
+            <Border Name="TitleBarContainer" DockPanel.Dock="Top">
+                <ContentControl Content="{CompiledBinding TitleBarViewModel}" />
+            </Border>
+            <ContentControl Content="{CompiledBinding}" />
+        </DockPanel>
+    </Panel>
 </windowing:AppWindow>
